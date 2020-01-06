@@ -53,6 +53,10 @@ def geocode_geo(addrs):
         for i in range(len(js['geocodes'])):
             print(addrs.split("|")[i])
             js['geocodes'][i]['address'] = str(addrs.split("|")[i])
+            lat = '-'
+            lon = '-'
+            if ',' in key_exists(js['geocodes'][i], 'location'):
+                [lat, lon] = key_exists(js['geocodes'][i], 'location').split(',')
             res_list.append([str(addrs.split("|")[i]),
                              key_exists(js['geocodes'][i], 'formatted_address'),
                              key_exists(js['geocodes'][i], 'country'),
@@ -60,7 +64,7 @@ def geocode_geo(addrs):
                              key_exists(js['geocodes'][i], 'city'),
                              key_exists(js['geocodes'][i], 'citycode'),
                              key_exists(js['geocodes'][i], 'district'),
-                             key_exists(js['geocodes'][i], 'location')])
+                             lat, lon])
     print("geo end")
     return res_list
 

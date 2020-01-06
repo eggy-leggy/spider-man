@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import os
+import zipfile
 
-data_path = r'./data/'
+data_path = r'C:\Users\chunqiangfan\work\github\OfflineReverseGeocode\data\data.zip'
 
 
 ######
-# 将分散的文件合并为一个文件
+# 将分散的文件合并为一个文件 (读取zip文件)
 # p：省
 # c：市
 # d：区
@@ -14,46 +15,50 @@ data_path = r'./data/'
 # t：城镇（太多暂不处理）
 ######
 
-def get_df(f_list):
+def get_df(zf, f_list):
     df = pd.DataFrame()
-    for f in f_list:
-        # print("read file ", data_path + f)
-        df = df.append(pd.read_csv(data_path + f))
+    for f_path in f_list:
+        f = zf.open(f_path)
+        df = df.append(pd.read_csv(f))
+        f.close()
     return df
 
 
 if __name__ == '__main__':
     print('start')
+    zf_list = zipfile.ZipFile(data_path, 'r')
     file_lv1 = list()
     file_lv2 = list()
     file_lv3 = list()
     file_lv4 = list()
     file_lv5 = list()
-    file_list = os.listdir(data_path)
-    for file_name in file_list:
-        if file_name[:6] == 'level1':
+    for file_name in zf_list.namelist():
+        if file_name[5:11] == 'level1':
             file_lv1.append(file_name)
             continue
-        if file_name[:6] == 'level2':
+        if file_name[5:11] == 'level2':
             file_lv2.append(file_name)
             continue
-        if file_name[:6] == 'level3':
+        if file_name[5:11] == 'level3':
             file_lv3.append(file_name)
             continue
-        if file_name[:6] == 'level4':
+        if file_name[5:11] == 'level4':
             file_lv4.append(file_name)
             continue
-        if file_name[:6] == 'level5':
+        if file_name[5:11] == 'level5':
             file_lv5.append(file_name)
             continue
-    df1 = get_df(file_lv1)
-    df2 = get_df(file_lv2)
-    df3 = get_df(file_lv3)
-    df4 = get_df(file_lv4)
+    df1 = get_df(zf_list, file_lv1)
+    df2 = get_df(zf_list, file_lv2)
+    df3 = get_df(zf_list, file_lv3)
+    df4 = get_df(zf_list, file_lv4)
+    # df5 = get_df(zf_list, file_lv5)   文件太多，一次加载时间过长，后期优化
+    zf_list.close()
     df1.columns = ['p', 'p_name']
     df2.columns = ['0', 'c_name']
     df3.columns = ['0', 'd_name']
     df4.columns = ['0', 's_name']
+    # df5.columns = ['0', 't_type', 't_name']   文件太多，一次加载时间过长，后期优化
     df2['p'] = df2['0'].map(lambda x: int(x[3:5]))
     df2['c'] = df2['0'].map(lambda x: int(x[5:]))
     df3['p'] = df3['0'].map(lambda x: int(x[3:5]))

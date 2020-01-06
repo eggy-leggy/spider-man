@@ -5,6 +5,9 @@ from retrying import retry
 import pandas as pd
 import os
 
+# 爬取行政区数据，按照省、市、区（县）、乡镇（街道）、居委会划分level1-level5
+# 生成文件需要后期合并
+
 url_head = 'http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2018/'
 
 status_count = 0
